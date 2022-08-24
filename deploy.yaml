@@ -1,0 +1,85 @@
+---
+#  Assign labels to nodes to used as node affinity in services deployment
+#  Note: Assuming that affinity are configured in services value yaml
+nodes:
+  # - nodeName:
+  #     labels:
+  #       key1: value1
+  #       key2: value2
+  #     security roles
+  - worker01:
+      labels:
+        group: grp1
+        networkspeed: 10g
+        managed-by: SS8
+  - worker02:
+      labels:
+        group: grp2
+        networkspeed: 10g
+        managed-by: SS8
+#  Set rescource  limits to namespace
+resourceQuota:
+  # - <namespace>:
+  #     <resouceQuota spec contents>
+  # - intellego:
+  #     hard:
+  #       requests.cpu: 500m
+  #       requests.memory: 100Mi
+  #       limits.cpu: 16
+  #       limits.memory: 32Gi
+  # - metahub:
+  #     hard:
+  #       requests.cpu: 500m
+  #       requests.memory: 100Mi
+  #       limits.cpu: 128
+  #       limits.memory: 512Gi
+    - dcg-test-surya:
+        hard:
+          requests.cpu: 500m
+          requests.memory: 100m
+          limits.cpu: 1
+          limits.memory: 500m
+
+#  Set overall resource limit to for containers
+limitRange:
+  # - <namespace>:
+  #     <limitRange spec contents>
+  # - intellego:
+  #     - type: "Container"
+  #       max: 
+  #         cpu: "2"
+  #         memory: "2Gi"
+  #       min:
+  #         cpu: "100m"
+  #         memory: "4Mi"
+  #       default:
+  #         cpu: "300m"
+  #         memory: "200Mi"
+  #       defaultRequest:
+  #         cpu: "200m"
+  #         memory: "100Mi"
+  #       maxLimitRequestRatio:
+  #         cpu: "1"
+  #     - type: "Pod"
+  #       max:
+  #         cpu: "2" 
+  #         memory: "1Gi" 
+  #       min:
+  #         cpu: "200m" 
+  #         memory: "6Mi" 
+  #       maxLimitRequestRatio:
+  #         cpu: "1" 
+
+
+
+#  List services to deploy
+deploy:
+  - common-service
+  - zookeeper-kafka
+  - cassandra
+  - elastic
+  - kibana
+  - metahub
+  - xcipio
+  - intellego
+  - xdis
