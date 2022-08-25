@@ -111,6 +111,7 @@ if (__name__ == "__main__"):
         config = configure(args.file, logger)
         config.configure_labels()
         config.configure_resource_quota()
+        config.configure_limit_range()
     else:
         logger.debug("Not initializing SS8 kubernetes objects")
 
