@@ -72,6 +72,45 @@ class configure:
                 #cmd = "kubectl apply -f "+ self.file_home_dir + "/yamls/ss8-" + namespace + "-resourcequota.yaml"
                 subprocess.run(["kubectl apply -f "+ self.file_home_dir + "/yamls/ss8-" + namespace + "-resourcequota.yaml"], shell=True)
    #             self.run_cmd(cmd)
+   
+   
+   
+   
+    def configure_limit_range(self):
+        self.logging.info("Applying SS8 limit range")
+        # load resource template
+        try:
+            with open(self.file_home_dir+"/templates/limitrange.yaml", 'r') as file:
+                template = yaml.safe_load(file)
+        except:
+            self.logging.error("ERROR was not able to read template:"+self.file_home_dir+"/templates/limitrange.yaml")
+            exit(1)
             
-            
-    
+        # remove old file create from template if they exist
+        if os.path.exists(self.file_home_dir+"/yamls/") and os.path.isdir(self.file_home_dir+"/yamls/"):
+            shutil.rmtree(self.file_home_dir+"/yamls/")
+        os.makedirs(self.file_home_dir+"/yamls/")
+        
+        # generating limitrange yaml for each namespace
+        self.logging.debug(("Original: "+str(template)))
+#        print(("Original: "+str(template)))
+#        print(self.config)
+        for quota_dict in self.config["limitRange"]:
+            #self.logging.info("Creating resource quota for namespace: "+str(list(quota_dict.keys())[0]))
+            #print(namespace)
+#            print(self.namespace_exist)
+            for namespace in quota_dict.keys():
+                cmd = [self.file_home_dir+"/check_namespace.sh", namespace]
+                subprocess.run(cmd)
+ #               if (not self.namespace_exist(namespace)):
+ #                   self.create_namespace(namespace)
+                self.logging.info("Creating limit range for namespace: "+namespace)
+                template["metadata"]["name"]="ss8-"+namespace+"-limitrange"
+                template["metadata"]["namespace"]=namespace
+                template["spec"]=quota_dict[namespace]
+                self.logging.debug(("ss8-"+namespace+"-limitrange.yaml: \n"+yaml.dump(template)))
+                with open(self.file_home_dir+"/yamls/ss8-"+namespace+"-limitrange.yaml", "w") as write:
+                    write.write(yaml.dump(template))
+                #cmd = "kubectl apply -f "+ self.file_home_dir + "/yamls/ss8-" + namespace + "-limitrange.yaml"
+                subprocess.run(["kubectl apply -f "+ self.file_home_dir + "/yamls/ss8-" + namespace + "-limitrange.yaml"], shell=True)
+   #             self.run_cmd(cmd)
